@@ -45,8 +45,6 @@ void displaySymbol(int symbolIndex, int rotation, uint32_t color) {
 }
 
 void clearDisplay() {
-  for (int i = 0; i < numPixels; i++) {
-    strip.setPixelColor(i, 0);
-  }
+  strip.clear();
   strip.show();
 }

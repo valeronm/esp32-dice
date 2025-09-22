@@ -31,10 +31,6 @@ float getAbsoluteAcceleration() {
   return accel;
 }
 
-void deepSleepAndWakeOnMotion() {
-    qmi.configWakeOnMotion();
-    esp_sleep_enable_ext0_wakeup((gpio_num_t)WS_IMU_INT2, 0);
-    delay(100);
-
-    esp_deep_sleep_start();
+void configWakeOnMotionInterrupt() {
+  qmi.configWakeOnMotion();
 }
