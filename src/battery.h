@@ -10,22 +10,23 @@ TwoWire wire(1);
 double voltage = 0; // Variable to keep track of LiPo voltage
 double soc = 0; // Variable to keep track of LiPo state-of-charge (SOC)
 
-void initBattery() {
+bool initBattery() {
   pinMode(gndPin, OUTPUT);
   digitalWrite(gndPin, LOW); // Connect GND pin to ground to enable battery measurement
   
   if (!wire.begin(SDA_PIN, SCL_PIN)) {
     Serial.println("⚠️ I2C bus for MAX1704x initialization failed. Check wiring.");
-    return;
+    return false;
   }
 
   if (lipo.begin(wire) == false) {
     Serial.println("⚠️ MAX1704x not detected. Check wiring.");
-    return;
+    return false;
   }
 
   lipo.quickStart();
   Serial.println("✅ Battery monitor initialized");
+  return true;
 }
 
 void updateBatteryStatus() {

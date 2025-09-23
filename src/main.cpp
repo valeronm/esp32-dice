@@ -1,7 +1,6 @@
 #include "accelerometer.h"
 #include "led_matrix.h"
 #include "battery.h"
-#include "sleep.h"
 #include "bthome.h"
 
 // Configuration constants
@@ -53,12 +52,23 @@ void checkWakeUpReason() {
   }
 }
 
+bool batteryInitialized = false;
+
+void deepSleep() {
+  if (batteryInitialized) {
+    esp_sleep_enable_timer_wakeup(60 * 1000000); // 60 seconds sleep
+  }
+  esp_sleep_enable_ext0_wakeup((gpio_num_t)WS_IMU_INT2, 0);
+
+  esp_deep_sleep_start();
+}
+
 void setup() {
   Serial.begin(115200);
 
   initMatrix();
   initIMU();
-  initBattery();
+  batteryInitialized = initBattery();
 
   checkWakeUpReason();
   delay(100);
@@ -80,7 +90,7 @@ enum AdvertisementState {
   IDLE
 };
 
-void processAdvertisement() {
+void processBatteryAdvertisement() {
   static AdvertisementState state = STARTING;
   static unsigned long stateChangedTime = 0;
 
@@ -193,7 +203,9 @@ void processDice() {
 }
 
 void loop() {
-  processAdvertisement();
+  if (batteryInitialized) {
+    processBatteryAdvertisement();
+  }
   processDice();
 
   delay(100);
